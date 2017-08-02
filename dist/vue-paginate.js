@@ -65,6 +65,14 @@
       tag: {
         type: String,
         default: 'ul'
+      },
+      refreshCurrentPage: {
+        type: Boolean,
+        default: true
+      },
+      refreshKey: {
+        type: String,
+        default: null
       }
     },
     data: function data () {
@@ -102,10 +110,35 @@
       currentPage: function currentPage () {
         this.paginateList()
       },
-      list: function list () {
+      list: function list (newList, oldList) {
+        var this$1 = this;
+
         // On list change, refresh the paginated list
-        this.currentPage = 0
         this.paginateList()
+        var vm = this
+        if (this.refreshCurrentPage) {
+          this.currentPage = 0
+        } else {
+          var position = -1
+          var item = 0
+          while (position < 0 && item < this.per && newList.length === oldList.length) {
+            if (this$1.refreshKey) {
+              var newListkeys = newList.map(function(o) { return o[vm.refreshKey] })
+              var oldListkeys = oldList.map(function(o) { return o[vm.refreshKey] })
+
+              position = newListkeys.indexOf(oldListkeys[this$1.currentPage * this$1.per + item++])
+            } else {
+              position = newList.indexOf(oldList[this$1.currentPage * this$1.per + item++])
+            }
+          }
+          if (position === -1) {
+            this.currentPage = 0
+          } else {
+            this.currentPage = parseInt(position / this.per)
+          }
+        }
+
+        // this.paginateList()
       },
       per: function per () {
         this.currentPage = 0

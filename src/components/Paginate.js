@@ -21,6 +21,14 @@ export default {
     tag: {
       type: String,
       default: 'ul'
+    },
+    refreshCurrentPage: {
+      type: Boolean,
+      default: true
+    },
+    refreshKey: {
+      type: String,
+      default: null
     }
   },
   data () {
@@ -58,10 +66,33 @@ export default {
     currentPage () {
       this.paginateList()
     },
-    list () {
+    list (newList, oldList) {
       // On list change, refresh the paginated list
-      this.currentPage = 0
       this.paginateList()
+      var vm = this
+      if (this.refreshCurrentPage) {
+        this.currentPage = 0
+      } else {
+        var position = -1
+        var item = 0
+        while (position < 0 && item < this.per && newList.length === oldList.length) {
+          if (this.refreshKey) {
+            var newListkeys = newList.map(function(o) { return o[vm.refreshKey] })
+            var oldListkeys = oldList.map(function(o) { return o[vm.refreshKey] })
+
+            position = newListkeys.indexOf(oldListkeys[this.currentPage * this.per + item++])
+          } else {
+            position = newList.indexOf(oldList[this.currentPage * this.per + item++])
+          }
+        }
+        if (position === -1) {
+          this.currentPage = 0
+        } else {
+          this.currentPage = parseInt(position / this.per)
+        }
+      }
+
+      // this.paginateList()
     },
     per () {
       this.currentPage = 0
