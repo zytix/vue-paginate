@@ -64,7 +64,7 @@ export default {
     },
     list (newList, oldList) {
       const newMaxPage = Math.ceil(newList / this.per)
-      if (this.refreshCurrentPage) {
+      if (this.refreshCurrentPage || newMaxPage === 0) {
         this.currentPage = 0
       } else if (this.currentPage > newMaxPage - 1) {
         this.currentPage = newMaxPage - 1
