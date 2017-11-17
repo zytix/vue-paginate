@@ -63,10 +63,11 @@ export default {
       this.paginateList()
     },
     list (newList, oldList) {
-      // On list change, refresh the paginated list if <refreshCurrentPage>
-      // or list length changed
-      if (newList.length !== oldList.length || this.refreshCurrentPage) {
+      const newMaxPage = Math.ceil(newList / this.per)
+      if (this.refreshCurrentPage) {
         this.currentPage = 0
+      } else if (this.currentPage > newMaxPage - 1) {
+        this.currentPage = newMaxPage - 1
       }
       this.paginateList()
     },
